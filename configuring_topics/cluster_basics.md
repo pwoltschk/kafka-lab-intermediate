@@ -130,3 +130,38 @@ Explore behavior with:
 - Reading data with a second consumer in parallel.
 - Reading data with two consumers from the same consumer group.
 - Observing changes when new data is produced.
+
+### Exercise 3: Log Compaction
+
+This exercise focuses on configuring the `sensor3` topic for log compaction.
+
+#### Configure Sensor3 Topic
+
+```bash
+# Topic creation with specific configurations
+kafka-topics --bootstrap-server localhost:19092 --create --topic sensor3 --partitions 1 --replication-factor 3 --if-not-exists
+
+# Setting log compaction parameters
+kafka-configs --alter --add-config cleanup.policy=compact --entity-type topics --entity-name sensor3 --bootstrap-server localhost:19092
+# ... [other parameters setup]
+```
+
+#### Produce and Observe Data Behavior
+
+```bash
+# Produce data with keys and observe behavior
+seq 5 | sed 's/\([0-9]\+\)/\1:\1/g' | ./kafka-console-producer --broker-list localhost:19092 --topic sensor3  --property parse.key=true --property key.separator=: && echo 'Produced 5 messages.'
+```
+
+```bash
+# Read data from sensor3 topic
+./kafka-console-consumer --bootstrap-server localhost:19092,localhost:29092,localhost:39092 --from-beginning --topic sensor3
+```
+
+Lab Exploration:
+
+- Repeating data multiple times and observing behavior.
+- Producing a sequence of entries, reading data, and then producing another sequence.
+- Optional: Manually sending data and observing topic behavior.
+
+Feel free to explore and experiment further to gain a deeper understanding of Kafka's behavior and functionalities within this lab environment.
